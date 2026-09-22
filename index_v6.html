@@ -1,0 +1,1705 @@
+<!-- VOLARE 版本標記：v6（2026-09-22）本版更新：修正主打片單桌機版無效問題／場館營業時間改白字＋顏色選擇／新增據點周邊地圖上傳 -->
+<title>VOLARE 飛行體驗主題館</title>
+<style>
+  :root{
+    --orange:#dc6024;
+    --orange-deep:#b8481a;
+    --yellow:#e8dc37;
+    --ink:#1c1410;
+    --paper:#fbf3e2;
+    --paper-dim:#f2e6cd;
+    --night:#171b22;
+    --night-2:#212733;
+    --cyan:#4fd7e0;
+    --red:#e2402c;
+    --green:#4a9d6f;
+    --blue:#3f7fc9;
+    --white:#fffaf0;
+    --radius-s:10px;
+    --radius-m:18px;
+    --border-w:3px;
+    --shadow-off:6px;
+    --maxw:1180px;
+    --gutter:16px;
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans TC', 'Archivo Black', sans-serif;
+    font-weight:500;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  img{max-width:100%;display:block;}
+  a{color:inherit;}
+  ul{margin:0;padding:0;list-style:none;}
+  h1,h2,h3,h4{margin:0;font-family:'Noto Sans TC',sans-serif;font-weight:900;}
+  p{margin:0;}
+
+  .wrap{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:0 var(--gutter);
+  }
+
+  /* ---------- focus ---------- */
+  a:focus-visible, button:focus-visible{
+    outline:3px solid var(--ink);
+    outline-offset:3px;
+  }
+
+  /* ---------- decorative: checkerboard ---------- */
+  .checker{
+    background-image:
+      linear-gradient(45deg, var(--yellow) 25%, transparent 25%, transparent 75%, var(--yellow) 75%),
+      linear-gradient(45deg, var(--yellow) 25%, transparent 25%, transparent 75%, var(--yellow) 75%);
+    background-color: var(--orange);
+    background-size: 28px 28px;
+    background-position: 0 0, 14px 14px;
+  }
+  .checker-band{
+    height:22px;
+    width:100%;
+  }
+
+  /* ---------- sticker / badge ---------- */
+  .sticker{
+    display:inline-flex;
+    align-items:center;
+    gap:.4em;
+    padding:.5em 1.1em;
+    background:var(--yellow);
+    color:var(--ink);
+    font-weight:900;
+    font-size:.95rem;
+    border:var(--border-w) solid var(--ink);
+    border-radius:999px;
+    box-shadow: 4px 4px 0 var(--ink);
+    transform:rotate(-3deg);
+    white-space:nowrap;
+  }
+  .sticker.alt{background:var(--white);}
+  .sticker.tilt-r{transform:rotate(3deg);}
+
+  .burst{
+    position:relative;
+    display:inline-block;
+    padding:.55em 1em;
+    background:var(--white);
+    color:var(--ink);
+    font-weight:900;
+    border:var(--border-w) solid var(--ink);
+    clip-path: polygon(4% 18%, 14% 2%, 26% 14%, 40% 0%, 52% 15%, 66% 2%, 76% 16%, 92% 6%, 88% 24%, 100% 36%,
+      88% 48%, 98% 62%, 82% 66%, 88% 84%, 70% 78%, 64% 96%, 50% 82%, 36% 98%, 28% 82%, 12% 92%, 16% 74%,
+      2% 68%, 12% 52%, 0% 38%, 14% 30%);
+  }
+
+  .star{
+    position:absolute;
+    width:34px;height:34px;
+    background:var(--yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  }
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5em;
+    padding:.85em 1.6em;
+    font-family:inherit;
+    font-weight:900;
+    font-size:1rem;
+    border:var(--border-w) solid var(--ink);
+    border-radius:999px;
+    cursor:pointer;
+    text-decoration:none;
+    box-shadow: 5px 5px 0 var(--ink);
+    transition: transform .12s ease, box-shadow .12s ease;
+    background:var(--ink);
+    color:var(--paper);
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink);}
+  .btn:active{transform:translate(1px,1px);box-shadow:3px 3px 0 var(--ink);}
+  .btn.primary{background:var(--yellow);color:var(--ink);}
+  .btn.on-dark{background:var(--yellow);color:var(--ink);}
+  .btn.ghost{background:var(--paper);color:var(--ink);}
+  .btn.ghost.on-dark{background:transparent;color:var(--white);border-color:var(--white);box-shadow:5px 5px 0 var(--white);}
+  .btn.ghost.on-dark:hover{box-shadow:7px 7px 0 var(--white);}
+  .btn.small{padding:.6em 1.1em;font-size:.85rem;box-shadow:4px 4px 0 var(--ink);}
+
+  /* ---------- nav ---------- */
+  .nav{
+    position:sticky;
+    top:env(safe-area-inset-top, 0px);
+    z-index:50;
+    background:var(--ink);
+    border-bottom:var(--border-w) solid var(--ink);
+  }
+  .nav-inner{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:12px var(--gutter);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    text-decoration:none;
+    color:var(--white);
+  }
+  .brand-mark{
+    font-family:'Archivo Black', sans-serif;
+    font-size:1.5rem;
+    letter-spacing:.5px;
+    transform:skewX(-6deg);
+    color:var(--yellow);
+  }
+  .brand-sub{
+    font-size:.72rem;
+    font-weight:700;
+    color:var(--white);
+    opacity:.85;
+  }
+  .nav-right-group{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .nav-links{
+    display:none;
+    align-items:center;
+    gap:22px;
+  }
+  .nav-links a{
+    color:var(--white);
+    text-decoration:none;
+    font-weight:700;
+    font-size:.92rem;
+    padding:4px 2px;
+    border-bottom:3px solid transparent;
+  }
+  .nav-links a:hover{border-color:var(--yellow);}
+  .nav-cta{display:none;}
+  .nav-tools{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .lang-switch{
+    display:flex;
+    align-items:center;
+    gap:2px;
+    background:rgba(255,255,255,.08);
+    border:2px solid rgba(255,255,255,.35);
+    border-radius:999px;
+    padding:3px;
+  }
+  .lang-btn{
+    background:transparent;
+    border:none;
+    color:var(--white);
+    font-weight:900;
+    font-size:.72rem;
+    line-height:1;
+    padding:6px 9px;
+    border-radius:999px;
+    cursor:pointer;
+    opacity:.65;
+    font-family:inherit;
+  }
+  .lang-btn:hover{opacity:1;}
+  .lang-btn[aria-pressed="true"]{background:var(--yellow);color:var(--ink);opacity:1;}
+  .nav-toggle{
+    display:inline-flex;
+    background:transparent;
+    border:2px solid var(--white);
+    border-radius:8px;
+    color:var(--white);
+    padding:8px 10px;
+    font-size:1.1rem;
+    cursor:pointer;
+  }
+  @media(min-width:860px){
+    .nav-toggle{display:none;}
+    .nav-links{display:flex;}
+    .nav-cta{display:inline-flex;}
+  }
+  @media(max-width:859px){
+    .nav-links{
+      position:absolute;
+      top:100%;left:0;right:0;
+      flex-direction:column;
+      align-items:flex-start;
+      background:var(--ink);
+      padding:14px var(--gutter) 22px;
+      border-bottom:var(--border-w) solid var(--yellow);
+      display:none;
+      gap:14px;
+    }
+    .nav-links.open{display:flex;}
+    .nav-links .btn{width:100%;}
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(120% 90% at 15% 0%, #f2833f 0%, var(--orange) 45%, var(--orange-deep) 100%);
+    color:var(--white);
+    padding:56px 0 64px;
+    overflow:hidden;
+  }
+  .hero-deco{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+  .hero-checker-tl{
+    position:absolute;top:-10px;left:-10px;width:120px;height:120px;
+    opacity:.9;
+    transform:rotate(-6deg);
+  }
+  .hero-checker-br{
+    position:absolute;bottom:-16px;right:-16px;width:160px;height:90px;
+    opacity:.85;
+    transform:rotate(4deg);
+  }
+  .hero-inner{
+    position:relative;
+    z-index:2;
+    display:grid;
+    grid-template-columns:1fr;
+    gap:36px;
+    align-items:center;
+  }
+  @media(min-width:900px){
+    .hero-inner{grid-template-columns:1.05fr .95fr;gap:24px;}
+  }
+  .hero-eyebrow{margin-bottom:14px;}
+  .hero-title{
+    font-family:'Archivo Black', sans-serif;
+    font-size:clamp(3.2rem, 12vw, 6rem);
+    line-height:.92;
+    letter-spacing:1px;
+    transform:skewX(-4deg);
+    color:var(--white);
+    text-shadow: 5px 5px 0 var(--ink);
+    margin:0 0 6px;
+  }
+  .hero-subtitle{
+    font-size:clamp(1.3rem,4vw,1.9rem);
+    margin-bottom:18px;
+    color:var(--yellow);
+  }
+  .hero-tagline-zh{
+    font-size:clamp(1.05rem,3vw,1.25rem);
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .hero-tagline-en{
+    font-family:'Archivo Black',sans-serif;
+    font-size:.82rem;
+    letter-spacing:2px;
+    color:var(--night);
+    background:var(--yellow);
+    display:inline-block;
+    padding:6px 12px;
+    border:var(--border-w) solid var(--ink);
+    transform:rotate(-1.5deg);
+    margin-bottom:26px;
+  }
+  .hero-ctas{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .hero-visual{
+    position:relative;
+    aspect-ratio: 4/3;
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-m);
+    overflow:hidden;
+    box-shadow: 8px 8px 0 var(--ink);
+    background:linear-gradient(180deg,#bfe6f5 0%,#8fd0ea 45%,#3f9dc7 100%);
+  }
+  .hero-visual svg{width:100%;height:100%;display:block;}
+  .hero-visual img{width:100%;height:100%;display:block;object-fit:cover;}
+  .hero-visual-tag{
+    position:absolute;
+    left:12px;bottom:12px;
+    z-index:3;
+    font-size:.7rem;
+    font-weight:700;
+    background:rgba(28,20,16,.78);
+    color:var(--white);
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .float-slow{animation:floaty 6s ease-in-out infinite;}
+  .float-slow2{animation:floaty 7s ease-in-out infinite .8s;}
+  @keyframes floaty{
+    0%,100%{transform:translateY(0px);}
+    50%{transform:translateY(-10px);}
+  }
+
+  /* ---------- section shell ---------- */
+  section{padding:64px 0;position:relative;}
+  .section-head{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:34px;
+  }
+  .section-title{
+    font-size:clamp(1.9rem,5vw,2.6rem);
+  }
+  .section-note{
+    font-weight:700;
+    font-size:.9rem;
+    opacity:.75;
+  }
+  .on-dark .section-note{opacity:.7;}
+
+  /* ---------- intro ---------- */
+  .intro{background:var(--paper);}
+  .intro-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:28px;
+    align-items:center;
+  }
+  @media(min-width:860px){
+    .intro-grid{grid-template-columns:1.1fr .9fr;gap:40px;}
+  }
+  .intro-text{
+    font-size:1.05rem;
+    font-weight:700;
+  }
+  .placeholder-box{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    text-align:center;
+    background:repeating-linear-gradient(135deg, #efe3c9, #efe3c9 10px, #e7d8b8 10px, #e7d8b8 20px);
+    border:2.5px dashed #a98f5f;
+    border-radius:var(--radius-m);
+    color:#6b5a3c;
+    font-weight:700;
+    font-size:.85rem;
+    padding:20px;
+    min-height:220px;
+  }
+  .placeholder-box .ph-icon{font-size:1.8rem;}
+  .intro-photo{aspect-ratio:4/3;}
+  .media-photo{
+    aspect-ratio:4/3;
+    border-radius:var(--radius-m);
+    overflow:hidden;
+    border:var(--border-w) solid var(--ink);
+  }
+  .media-photo img{width:100%;height:100%;display:block;object-fit:cover;}
+
+  /* ---------- now showing ---------- */
+  .showing{
+    background:var(--night);
+    color:var(--white);
+  }
+  .film-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+  }
+  @media(min-width:640px){
+    .film-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  @media(min-width:900px){
+    .film-grid{grid-template-columns:repeat(4,1fr);}
+  }
+  .film-card{
+    position:relative;
+    background:var(--night-2);
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-s);
+    overflow:hidden;
+    box-shadow:5px 5px 0 rgba(0,0,0,.5);
+    display:flex;
+    flex-direction:column;
+  }
+  .film-card.featured{grid-column: span 2;}
+  .film-poster{
+    aspect-ratio:4/3;
+    position:relative;
+    background:linear-gradient(160deg,#333c4c,#171b22);
+  }
+  .film-poster .placeholder-box{
+    position:absolute;inset:0;
+    border-radius:0;
+    border:none;
+    background:linear-gradient(160deg,#3a4356,#1a1f28);
+    color:#c8cede;
+  }
+  .film-poster img{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    display:block;
+    object-fit:cover;
+  }
+  .film-body{
+    padding:14px 14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex:1;
+  }
+  .film-name{font-size:1.02rem;font-weight:900;}
+  .film-name-en{font-size:.72rem;opacity:.6;font-weight:700;}
+  .film-period{
+    font-size:.7rem;
+    opacity:.8;
+    font-weight:700;
+    margin-top:auto;
+    padding-top:8px;
+    font-variant-numeric:tabular-nums;
+  }
+  .film-note{
+    display:inline-block;
+    margin-top:6px;
+    font-size:.68rem;
+    font-weight:900;
+    color:var(--night);
+    background:var(--yellow);
+    padding:2px 8px;
+    border-radius:999px;
+    width:fit-content;
+  }
+
+  /* ---------- pricing ---------- */
+  .pricing{background:var(--paper);}
+  .price-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+  @media(min-width:860px){
+    .price-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  .price-card{
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-m);
+    padding:26px 22px 22px;
+    box-shadow:7px 7px 0 var(--ink);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .price-card.theme-orange{background:var(--orange);color:var(--white);}
+  .price-card.theme-yellow{background:var(--yellow);color:var(--ink);}
+  .price-card.theme-night{background:var(--night);color:var(--white);}
+  .price-card h3{font-size:1.15rem;line-height:1.4;}
+  .price-includes{font-size:.75rem;font-weight:700;opacity:.8;margin-top:-10px;}
+  .tier-list{display:flex;flex-direction:column;gap:10px;}
+  .tier-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:10px;
+    background:rgba(255,255,255,.18);
+  }
+  .price-card.theme-yellow .tier-row{background:rgba(0,0,0,.08);}
+  .tier-row.highlight{
+    background:var(--ink);
+    color:var(--yellow);
+  }
+  .price-card.theme-yellow .tier-row.highlight{color:var(--yellow);}
+  .tier-main{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .tier-label{font-size:.85rem;font-weight:700;}
+  .tier-price{font-size:1.5rem;font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .tier-price .unit{font-size:.85rem;margin-left:2px;}
+  .tier-weekday{
+    display:inline-flex;
+    align-self:flex-start;
+    align-items:baseline;
+    gap:6px;
+    font-size:.72rem;
+    font-weight:900;
+    background:var(--ink);
+    color:var(--yellow);
+    padding:4px 10px;
+    border-radius:999px;
+    font-variant-numeric:tabular-nums;
+  }
+  .price-card.theme-night .tier-weekday{background:var(--yellow);color:var(--ink);}
+  .price-footnote{font-size:.75rem;font-weight:700;opacity:.85;margin-top:auto;}
+
+  /* ---------- venue ---------- */
+  .venue{background:var(--night);color:var(--white);}
+  .venue-primary{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:28px;
+  }
+  @media(min-width:860px){
+    .venue-primary{grid-template-columns:1fr 1fr;gap:32px;}
+  }
+  .venue-card{
+    background:var(--night-2);
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-m);
+    padding:24px;
+    box-shadow:6px 6px 0 rgba(0,0,0,.5);
+  }
+  .venue-name{font-size:1.4rem;margin-bottom:4px;}
+  .venue-status{
+    display:inline-block;
+    font-size:.72rem;
+    font-weight:900;
+    background:var(--cyan);
+    color:var(--ink);
+    padding:3px 10px;
+    border-radius:999px;
+    margin-bottom:14px;
+  }
+  .venue-address{font-weight:700;margin-bottom:16px;}
+  .hours-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  .hours-table tr{border-bottom:1px solid rgba(255,255,255,.15);}
+  .hours-table td{padding:8px 0;font-size:.88rem;}
+  .hours-table td:first-child{font-weight:700;color:var(--white);}
+  .hours-table td:last-child{text-align:right;font-weight:900;}
+  .transit-list li{
+    font-size:.85rem;
+    opacity:.9;
+    padding:4px 0;
+    padding-left:18px;
+    position:relative;
+  }
+  .transit-list li::before{
+    content:"↗";
+    position:absolute;left:0;
+    color:var(--yellow);
+    font-weight:900;
+  }
+  .venue-map .placeholder-box{
+    min-height:260px;
+    background:repeating-linear-gradient(135deg,#2a3140,#2a3140 10px,#232936 10px,#232936 20px);
+    border-color:#5b6577;
+    color:#a9b3c4;
+  }
+  .venue-map{padding:0;overflow:hidden;min-height:260px;position:relative;}
+  .venue-map img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .venue-secondary{margin-top:26px;}
+  .venue-secondary-title{font-size:.85rem;font-weight:900;opacity:.75;margin-bottom:12px;letter-spacing:.5px;}
+  .venue-mini-grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  @media(min-width:640px){.venue-mini-grid{grid-template-columns:repeat(2,1fr);}}
+  .venue-mini{
+    background:transparent;
+    border:2px dashed rgba(255,255,255,.35);
+    border-radius:var(--radius-s);
+    padding:16px 18px;
+  }
+  .venue-mini h4{font-size:1rem;margin-bottom:4px;}
+  .venue-mini p{font-size:.8rem;opacity:.85;margin-bottom:8px;}
+  .venue-mini .hours-table td{font-size:.78rem;padding:5px 0;}
+
+  /* ---------- announcements ---------- */
+  .announce{background:var(--paper);}
+  .announce-list{display:flex;flex-direction:column;gap:16px;}
+  .announce-card{
+    position:relative;
+    background:var(--white);
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-s);
+    padding:18px 20px;
+    box-shadow:5px 5px 0 var(--ink);
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .announce-date{
+    font-family:'Archivo Black',sans-serif;
+    font-size:.78rem;
+    color:var(--orange-deep);
+    min-width:96px;
+  }
+  .announce-body{flex:1;min-width:220px;}
+  .announce-title{font-size:1.02rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .pin-flag{
+    font-size:.65rem;
+    font-weight:900;
+    background:var(--red);
+    color:var(--white);
+    padding:2px 8px;
+    border-radius:999px;
+  }
+  .announce-text{font-size:.88rem;opacity:.85;}
+
+  /* ---------- contact ---------- */
+  .contact{background:var(--night);color:var(--white);}
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:32px;
+  }
+  @media(min-width:860px){
+    .contact-grid{grid-template-columns:1.1fr .9fr;}
+  }
+  .contact-block{
+    background:var(--night-2);
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-m);
+    padding:24px;
+  }
+  .contact-block h3{font-size:1.05rem;margin-bottom:14px;}
+  .ticket-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px;}
+  .contact-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 0;
+    border-top:1px solid rgba(255,255,255,.15);
+    font-size:.9rem;
+    flex-wrap:wrap;
+  }
+  .contact-line .label{font-weight:900;}
+  .contact-line .value{opacity:.85;font-weight:700;}
+  .todo-tag{
+    font-size:.65rem;
+    font-weight:900;
+    background:var(--yellow);
+    color:var(--ink);
+    padding:2px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .qr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .qr-box{
+    background:var(--night);
+    border:2px dashed rgba(255,255,255,.35);
+    border-radius:var(--radius-s);
+    padding:16px;
+    text-align:center;
+  }
+  .qr-placeholder{
+    aspect-ratio:1;
+    background:repeating-linear-gradient(45deg,#2a3140,#2a3140 8px,#232936 8px,#232936 16px);
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.6rem;
+    margin-bottom:10px;
+  }
+  .qr-photo{
+    aspect-ratio:1;
+    background:var(--white);
+    border-radius:8px;
+    margin-bottom:10px;
+    padding:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .qr-photo img{width:100%;height:100%;display:block;object-fit:contain;}
+  .qr-label{font-weight:900;font-size:.85rem;}
+  .qr-note{font-size:.68rem;opacity:.6;margin-top:4px;}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink);
+    color:var(--paper);
+    padding:32px 0;
+  }
+  .footer-inner{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    text-align:center;
+    font-size:.78rem;
+    opacity:.8;
+  }
+  @media(min-width:640px){
+    .footer-inner{flex-direction:row;justify-content:space-between;text-align:left;}
+  }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(20,14,10,.7);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--paper);
+    border:var(--border-w) solid var(--ink);
+    border-radius:var(--radius-m);
+    max-width:420px;
+    width:100%;
+    padding:28px 24px;
+    box-shadow:8px 8px 0 var(--ink);
+    position:relative;
+  }
+  .modal h3{font-size:1.3rem;margin-bottom:6px;}
+  .modal p{font-size:.85rem;opacity:.8;margin-bottom:18px;}
+  .modal-close{
+    position:absolute;top:14px;right:14px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    border-radius:999px;
+    width:32px;height:32px;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .modal-ticket-list{display:flex;flex-direction:column;gap:12px;}
+  .modal-ticket-list .btn{width:100%;}
+
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0;
+  }
+</style>
+
+
+<a href="#main" class="sr-only">跳至主要內容</a>
+
+<nav class="nav" id="site-nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">VOLARE</span>
+      <span class="brand-sub" id="nav-brand-sub">飛行體驗主題館</span>
+    </a>
+    <div class="nav-right-group">
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#showing" data-i18n="nav_showing">現正熱映</a></li>
+        <li><a href="#pricing" data-i18n="nav_pricing">票價資訊</a></li>
+        <li><a href="#venue" data-i18n="nav_venue">場館資訊</a></li>
+        <li><a href="#announce" data-i18n="nav_announce">劇院公告</a></li>
+        <li><a href="#contact" data-i18n="nav_contact">聯絡我們</a></li>
+        <li class="nav-cta"><button class="btn small primary" data-open-modal id="nav-cta-label">立即購票</button></li>
+      </ul>
+      <div class="nav-tools">
+        <div class="lang-switch" role="group" aria-label="Language / 語言切換 / 言語切替">
+          <button type="button" class="lang-btn" data-lang="zh" aria-pressed="true" title="中文">中</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English">EN</button>
+          <button type="button" class="lang-btn" data-lang="ja" aria-pressed="false" title="日本語">日</button>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="開啟選單">☰</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+  <div id="top"></div>
+  <section class="hero">
+    <div class="hero-deco" aria-hidden="true">
+      <div class="hero-checker-tl checker"></div>
+      <div class="hero-checker-br checker"></div>
+    </div>
+    <div class="wrap hero-inner">
+      <div>
+        <div class="hero-eyebrow"><span class="sticker" id="hero-eyebrow">潮流飛行．新地標</span></div>
+        <h1 class="hero-title" id="hero-title">VOLARE</h1>
+        <p class="hero-subtitle" id="hero-subtitle">飛行體驗主題館</p>
+        <p class="hero-tagline-zh" id="hero-tagline-zh">雙腳懸空，一秒飛上天</p>
+        <p class="hero-tagline-en" id="hero-tagline-en">GOOD VIBES. INTO THE HORIZON.</p>
+        <div class="hero-ctas">
+          <button class="btn primary" data-open-modal id="hero-cta-primary">立即購票</button>
+          <a class="btn ghost" href="#venue" id="hero-cta-secondary">查看場館資訊</a>
+        </div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="天空俯瞰飛行示意圖（正式主視覺待後台上傳）">
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#cdeaf7"/>
+              <stop offset="55%" stop-color="#8fd0ea"/>
+              <stop offset="100%" stop-color="#3f9dc7"/>
+            </linearGradient>
+            <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2f8fb8"/>
+              <stop offset="100%" stop-color="#1f6f95"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#sky)"/>
+          <ellipse cx="70" cy="60" rx="46" ry="14" fill="#ffffff" opacity=".85"/>
+          <ellipse cx="330" cy="40" rx="34" ry="11" fill="#ffffff" opacity=".7"/>
+          <path d="M0 190 Q 100 165 200 190 T 400 190 V300 H0 Z" fill="url(#sea)"/>
+          <path d="M0 205 Q 100 182 200 205 T 400 205 V300 H0 Z" fill="#256f92" opacity=".55"/>
+          <g opacity=".9">
+            <rect x="40" y="150" width="16" height="46" fill="#dc6024"/>
+            <rect x="60" y="130" width="20" height="66" fill="#b8481a"/>
+            <rect x="86" y="160" width="14" height="36" fill="#e8dc37"/>
+            <rect x="290" y="140" width="18" height="56" fill="#dc6024"/>
+            <rect x="312" y="120" width="22" height="76" fill="#b8481a"/>
+            <rect x="338" y="155" width="14" height="41" fill="#e8dc37"/>
+          </g>
+          <g class="float-slow" transform="translate(150,90)">
+            <circle cx="0" cy="0" r="9" fill="#1c1410"/>
+            <path d="M0 6 L -26 30 M0 6 L 26 30 M0 6 L 0 34" stroke="#1c1410" stroke-width="5" stroke-linecap="round" fill="none"/>
+          </g>
+          <g class="float-slow2" transform="translate(230,60)">
+            <circle cx="0" cy="0" r="7" fill="#1c1410"/>
+            <path d="M0 5 L -20 24 M0 5 L 20 24 M0 5 L 0 27" stroke="#1c1410" stroke-width="4" stroke-linecap="round" fill="none"/>
+          </g>
+        </svg>
+        <span class="hero-visual-tag">待上傳：天空俯瞰主視覺</span>
+      </div>
+    </div>
+  </section>
+  <div class="checker checker-band" aria-hidden="true"></div>
+
+  <section class="intro" id="intro">
+    <div class="wrap intro-grid">
+      <div>
+        <span class="sticker alt tilt-r" style="margin-bottom:16px;" data-i18n="intro_label">關於 VOLARE</span>
+        <p class="intro-text" id="intro-text"></p>
+      </div>
+      <div class="placeholder-box intro-photo" id="intro-photo">
+        <span class="ph-icon">🖼️</span>
+        <span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="showing" id="showing">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sticker" data-i18n="nav_showing">現正熱映</span>
+        <h2 class="section-title">NOW SHOWING</h2>
+        <p class="section-note" id="showing-note"></p>
+      </div>
+      <div class="film-grid" id="film-grid"></div>
+    </div>
+  </section>
+
+  <div class="checker checker-band" aria-hidden="true"></div>
+
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sticker tilt-r" data-i18n="nav_pricing">票價資訊</span>
+        <h2 class="section-title">TICKET PRICING</h2>
+        <p class="section-note" id="pricing-note"></p>
+      </div>
+      <div class="price-grid" id="price-grid"></div>
+    </div>
+  </section>
+
+  <section class="venue" id="venue">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sticker" data-i18n="nav_venue">場館資訊</span>
+        <h2 class="section-title">VENUE INFO</h2>
+      </div>
+      <div class="venue-primary" id="venue-primary"></div>
+      <div class="venue-secondary" id="venue-secondary" hidden>
+        <p class="venue-secondary-title" data-i18n="venue_secondary_title">其他據點</p>
+        <div class="venue-mini-grid" id="venue-mini-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="checker checker-band" aria-hidden="true"></div>
+
+  <section class="announce" id="announce">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sticker tilt-r" data-i18n="nav_announce">劇院公告</span>
+        <h2 class="section-title">ANNOUNCEMENTS</h2>
+      </div>
+      <div class="announce-list" id="announce-list"></div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="sticker" data-i18n="nav_contact">聯絡我們</span>
+        <h2 class="section-title">CONTACT</h2>
+        <p class="section-note" id="contact-note"></p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-block">
+          <h3 data-i18n="contact_ticketing_title">購票與客服</h3>
+          <div class="ticket-row" id="ticket-row"></div>
+          <div id="contact-lines"></div>
+        </div>
+        <div class="contact-block">
+          <h3 data-i18n="contact_qr_title">社群 QR Code</h3>
+          <div class="qr-grid" id="qr-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <span id="footer-copyright"></span>
+    <span id="footer-legal"></span>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button class="modal-close" id="modal-close" data-i18n-aria="modal_close" aria-label="關閉">✕</button>
+    <h3 id="modal-title">立即購票</h3>
+    <p data-i18n="modal_desc">售票通路僅提供以下平台，請選擇前往購票</p>
+    <div class="modal-ticket-list" id="modal-ticket-list"></div>
+  </div>
+</div>
+
+<script type="application/json" id="site-data">
+{
+  "meta": {
+    "siteTitle": "VOLARE 飛行體驗主題館",
+    "updatedAt": "2026-09-21",
+    "note": "此檔案為後台資料結構範本；前台目前以同結構之內嵌 JSON 運作，日後後台完成後可改為 fetch 此份資料。任何會顯示給訪客看的文字欄位，格式一律是 {\"zh\":\"中文\",\"en\":\"English\",\"ja\":\"日本語\"} 三語框架物件——後台請依此規劃三個語言分頁／欄位分別填寫；畫面只會顯示訪客目前選擇語言的那一版，缺少 en 或 ja 時會自動退回顯示中文，不會壞版。標示「待上傳」「待補」的欄位是給館內／後台人員看的內部備註，不隨語言切換翻譯，也不會顯示給一般訪客當作正式內容。主視覺英文標語（hero.brandSlogan）例外，固定顯示，不隨語言切換變動。片單評級已直接印製於海報素材上，前台不再另外疊加評級圖框。"
+  },
+  "hero": {
+    "eyebrow": { "zh": "潮流飛行．新地標", "en": "Trendsetting Flight · New Landmark", "ja": "話題の飛行体験・新名所" },
+    "title": "VOLARE",
+    "subtitle": { "zh": "飛行體驗主題館", "en": "Flight Experience Center", "ja": "フライト体験施設" },
+    "tagline": { "zh": "雙腳懸空，一秒飛上天", "en": "Feet off the ground. Airborne in a second.", "ja": "両足を浮かせて、一瞬で大空へ" },
+    "brandSlogan": "GOOD VIBES. INTO THE HORIZON.",
+    "ctaPrimaryLabel": { "zh": "立即購票", "en": "Buy Tickets", "ja": "チケット購入" },
+    "ctaSecondaryLabel": { "zh": "查看場館資訊", "en": "Venue Info", "ja": "施設情報を見る" },
+    "heroImagePlaceholder": "待上傳：天空俯瞰主視覺",
+    "heroImageUrl": null
+  },
+  "intro": {
+    "text": {
+      "zh": "VOLARE 飛行體驗主題館，打造城市最潮飛行新地標。全臺首座採用球型 LED 的沉浸式飛行體驗，搭乘飛行座椅感受雙腳騰空，以無畏姿態迎向未知，自由穿梭不同主題世界，在都市也能享受主題樂園級的飛行冒險。",
+      "en": "VOLARE Flight Experience Center is the city's trend-setting flying landmark. As Taiwan's first immersive flying experience with a spherical LED dome, step into a flying seat, feel your feet lift off the ground, and explore themed worlds with fearless freedom.",
+      "ja": "VOLARE フライト体験施設は、街でいちばん話題の飛行体験スポット。台湾初、球体型LEDドームを採用した没入型フライト体験で、専用シートに座れば両足が宙に浮き、恐れを知らない姿勢でさまざまなテーマの世界へ。都会にいながら、テーマパーク級の飛行アドベンチャーが楽しめます。"
+    },
+    "photoPlaceholder": "待上傳：飛行座椅／賽車體驗現場照",
+    "photoUrl": null
+  },
+  "nowShowing": {
+    "sectionNote": {
+      "zh": "片單如有異動，依館內最新公告為準；片單評級已印製於海報素材上",
+      "en": "Lineup subject to change — please check on-site announcements for the latest schedule. Ratings are printed on the poster artwork.",
+      "ja": "上映作品は変更となる場合があります。最新情報は館内アナウンスをご確認ください。レイティングはポスター内に表示しています。"
+    },
+    "films": [
+      {
+        "id": "aot",
+        "rating": "18+",
+        "ratingLabel": "限制級（僅供後台內部參考，不對外顯示）",
+        "featured": true,
+        "name": { "zh": "進擊的巨人：開戰宣言", "en": "Attack on Titan: Declaration of War", "ja": "進撃の巨人：開戦宣言" },
+        "note": { "zh": "恕不配合任何優惠", "en": "Not combinable with other offers", "ja": "他の優待との併用不可" },
+        "screeningStart": "2026-09-18",
+        "screeningEnd": "2026-11-30",
+        "posterPlaceholder": "待上傳：進擊的巨人主視覺（含評級標示）",
+        "posterUrl": "assets/aot-poster.jpg"
+      },
+      {
+        "id": "gf",
+        "rating": "12+",
+        "ratingLabel": "輔12級（僅供後台內部參考，不對外顯示）",
+        "name": { "zh": "地球保衛戰", "en": "Global Fighting", "ja": "地球防衛戦" },
+        "screeningStart": "2026-06-15",
+        "screeningEnd": null,
+        "posterPlaceholder": "待上傳：地球保衛戰海報（含評級標示）",
+        "posterUrl": null
+      },
+      {
+        "id": "ja",
+        "rating": "6+",
+        "ratingLabel": "保護級（僅供後台內部參考，不對外顯示）",
+        "name": { "zh": "勇闖侏儸紀", "en": "The Jurassic Adventure", "ja": "ジュラシック・アドベンチャー" },
+        "screeningStart": "2026-06-15",
+        "screeningEnd": null,
+        "posterPlaceholder": "待上傳：勇闖侏儸紀海報（含評級標示）",
+        "posterUrl": null
+      },
+      {
+        "id": "tp",
+        "rating": "0+",
+        "ratingLabel": "普遍級（僅供後台內部參考，不對外顯示）",
+        "name": { "zh": "玩具星球大冒險", "en": "Toy Planet: The Big Adventure", "ja": "トイプラネット大冒険" },
+        "screeningStart": "2026-06-15",
+        "screeningEnd": null,
+        "posterPlaceholder": "待上傳：玩具星球大冒險海報（含評級標示）",
+        "posterUrl": null
+      }
+    ],
+    "racing": {
+      "name": { "zh": "極速賽車體驗", "en": "Racing Simulator", "ja": "レーシングシミュレーター" },
+      "posterPlaceholder": "待上傳：賽車體驗現場照",
+      "posterUrl": null
+    }
+  },
+  "pricing": {
+    "sectionNote": {
+      "zh": "VOLARE 飛行體驗主題館保有活動最終解釋與修改權利",
+      "en": "VOLARE Flight Experience Center reserves the right to make final interpretations and changes to all offers.",
+      "ja": "VOLARE フライト体験施設は、すべての優待について最終解釈・変更の権利を有します。"
+    },
+    "groups": [
+      {
+        "id": "aot",
+        "theme": "orange",
+        "title": { "zh": "進擊的巨人：開戰宣言（8分鐘）", "en": "Attack on Titan: Declaration of War (8 min)", "ja": "進撃の巨人：開戦宣言（8分）" },
+        "tiers": [
+          {
+            "label": { "zh": "單人", "en": "Single", "ja": "お一人様" },
+            "price": "399",
+            "unit": "元",
+            "weekday": {
+              "label": { "zh": "周一至周四．平日限定", "en": "Mon–Thu Weekday Rate", "ja": "月〜木限定" },
+              "price": "349",
+              "unit": "元"
+            }
+          },
+          { "label": { "zh": "雙人", "en": "Pair (2 people)", "ja": "お二人様" }, "price": "698", "unit": "元" }
+        ],
+        "footnote": {
+          "zh": "進擊的巨人，恕不配合任何優惠",
+          "en": "Attack on Titan tickets cannot be combined with other offers.",
+          "ja": "「進撃の巨人」は他の優待との併用ができません。"
+        }
+      },
+      {
+        "id": "standard",
+        "theme": "yellow",
+        "title": { "zh": "常態片", "en": "Regular Films", "ja": "レギュラー上映" },
+        "tiers": [
+          {
+            "label": { "zh": "單片", "en": "1 Film", "ja": "1本" },
+            "price": "249",
+            "unit": "元",
+            "weekday": {
+              "label": { "zh": "周一至周四．平日限定", "en": "Mon–Thu Weekday Rate", "ja": "月〜木限定" },
+              "price": "199",
+              "unit": "元"
+            }
+          },
+          { "label": { "zh": "雙片", "en": "2 Films", "ja": "2本" }, "price": "398", "unit": "元" }
+        ],
+        "footnote": {
+          "zh": "平日限定價及雙片優惠價，恕不與其他優惠併用",
+          "en": "Weekday and 2-film rates cannot be combined with other offers.",
+          "ja": "平日限定料金・2本セット料金は他の優待との併用ができません。"
+        }
+      },
+      {
+        "id": "racing",
+        "theme": "night",
+        "title": { "zh": "極速賽車體驗", "en": "Racing Simulator", "ja": "レーシングシミュレーター" },
+        "tiers": [
+          { "label": { "zh": "單次", "en": "Single Ride", "ja": "1回" }, "price": "150", "unit": "元" },
+          {
+            "label": { "zh": "憑飛行體驗票根加購價", "en": "Add-on with Flight Ticket Stub", "ja": "搭乗券提示で追加購入" },
+            "price": "99",
+            "unit": "元",
+            "highlight": true
+          }
+        ]
+      }
+    ]
+  },
+  "venues": [
+    {
+      "id": "dagang",
+      "name": { "zh": "VOLARE 大港店", "en": "VOLARE Dagang", "ja": "VOLARE 大港店" },
+      "address": {
+        "zh": "高雄市鼓山區蓬萊路6之5號（大港橋旁）",
+        "en": "No. 6-5, Penglai Rd, Gushan Dist, Kaohsiung (next to Dagang Bridge)",
+        "ja": "高雄市鼓山区蓬萊路6之5号（大港橋そば）"
+      },
+      "status": { "zh": "營業中", "en": "Open", "ja": "営業中" },
+      "transit": [
+        { "zh": "輕軌｜駁二大義站，沿大港橋步行可達", "en": "LRT: Dayi Station (Pier-2), walk across Dagang Bridge", "ja": "LRT：駁二大義駅から大港橋を渡って徒歩" },
+        { "zh": "停車｜蓬萊停車場（大港橋旁）", "en": "Parking: Penglai Parking Lot (next to Dagang Bridge)", "ja": "駐車場：蓬萊駐車場（大港橋そば）" }
+      ],
+      "hours": [
+        { "days": { "zh": "週日至週四", "en": "Sun–Thu", "ja": "日〜木" }, "time": "10:00–21:00" },
+        { "days": { "zh": "週五至週六", "en": "Fri–Sat", "ja": "金・土" }, "time": "10:00–22:00" },
+        { "days": { "zh": "國定假日及假日前夕", "en": "Public holidays & eve", "ja": "祝日・祝前日" }, "time": "10:00–22:00" }
+      ],
+      "mapPlaceholder": "待上傳：大港店周邊地圖"
+    }
+  ],
+  "announcements": [
+    {
+      "date": "2026-06-15",
+      "pinned": true,
+      "title": {
+        "zh": "全新升級．震撼啟航",
+        "en": "Newly Upgraded — Ready for Takeoff",
+        "ja": "全面リニューアル・震撼の再出発"
+      },
+      "body": {
+        "zh": "VOLARE 大港店試營運展開，全新極速賽車體驗與《玩具星球大冒險》片單同步登場。",
+        "en": "VOLARE Dagang has begun trial operations, launching the all-new Racing Simulator alongside the \"Toy Planet: The Big Adventure\" film.",
+        "ja": "VOLARE 大港店が試験営業を開始。新登場のレーシングシミュレーターと「トイプラネット大冒険」を同時公開しました。"
+      }
+    },
+    {
+      "date": "2026-09-01",
+      "title": {
+        "zh": "《進擊的巨人：開戰宣言》為限制級內容",
+        "en": "\"Attack on Titan: Declaration of War\" is age-restricted (18+)",
+        "ja": "「進撃の巨人：開戦宣言」は18歳以上限定コンテンツです"
+      },
+      "body": {
+        "zh": "內容涉及較強烈之戰鬥與驚悚畫面，請年滿18歲旅客購票觀賞，現場將視需要請出示身分證件。",
+        "en": "This film contains intense combat and frightening scenes. Guests must be 18 or older to purchase tickets; ID may be requested on site.",
+        "ja": "戦闘・恐怖描写を含みます。ご購入は18歳以上に限らせていただき、現場でご本人確認をお願いする場合がございます。"
+      }
+    },
+    {
+      "date": "2026-09-01",
+      "title": {
+        "zh": "搭乘小提醒",
+        "en": "Rider Advisory",
+        "ja": "ご搭乗にあたっての注意"
+      },
+      "body": {
+        "zh": "飛行體驗座椅具動態晃動效果，孕婦、心臟疾病、暈眩體質及酒後旅客請避免搭乘；如身體有不適，請提前告知現場工作人員。",
+        "en": "The flight seats move dynamically. Not recommended for pregnant guests, those with heart conditions, motion sickness, or under the influence of alcohol. Please inform staff of any discomfort beforehand.",
+        "ja": "フライトシートは動的に動作します。妊娠中の方、心疾患をお持ちの方、乗り物酔いをしやすい方、飲酒後の方はご搭乗をお控えください。体調に不安がある場合は事前にスタッフへお申し出ください。"
+      }
+    }
+  ],
+  "contact": {
+    "sectionNote": {
+      "zh": "售票通路僅提供 KLOOK、KKday 兩平台，請於平台完成訂購",
+      "en": "Tickets are sold exclusively via KLOOK and KKday — please complete your purchase on one of these platforms.",
+      "ja": "チケットはKLOOKまたはKKdayのみでご購入いただけます。"
+    },
+    "ticketing": [
+      { "platform": "KLOOK", "href": "#", "note": "待補：KLOOK 商品頁連結" },
+      { "platform": "KKday", "href": "#", "note": "待補：KKday 商品頁連結" }
+    ],
+    "line": {
+      "label": { "zh": "官方 LINE", "en": "Official LINE", "ja": "公式LINE" },
+      "href": "#",
+      "note": "待補：官方 LINE 連結"
+    },
+    "email": {
+      "label": { "zh": "客服信箱", "en": "Customer Service Email", "ja": "お問い合わせメール" },
+      "value": "service@volare.example",
+      "note": "待補：正式客服信箱"
+    },
+    "socials": [
+      { "platform": "Facebook", "qrPlaceholder": "待上傳：Facebook QR Code", "qrUrl": null, "href": "#" },
+      { "platform": "Instagram", "qrPlaceholder": "待上傳：Instagram QR Code", "qrUrl": null, "href": "#" }
+    ]
+  },
+  "footer": {
+    "copyright": {
+      "zh": "© 2026 VOLARE 飛行體驗主題館．版權所有",
+      "en": "© 2026 VOLARE Flight Experience Center. All Rights Reserved.",
+      "ja": "© 2026 VOLARE フライト体験施設．All Rights Reserved."
+    },
+    "legal": {
+      "zh": "VOLARE 飛行體驗主題館保有活動最終解釋與修改權利",
+      "en": "VOLARE Flight Experience Center reserves the right to make final interpretations and changes.",
+      "ja": "VOLARE フライト体験施設は、最終解釈・変更の権利を有します。"
+    }
+  }
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  function esc(str){
+    if(str === undefined || str === null) return "";
+    return String(str)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+
+  // 後台資料 API（Google Apps Script）網址。部署後貼在這裡，前台就會即時抓取後台最新內容，
+  // 不用再手動同步；若留空或連不上，會自動退回使用下面內嵌的備援內容（不會壞版）。
+  var API_BASE_URL = 'https://script.google.com/macros/s/AKfycbxWO4fgsGuzSnz-4PJTMgnlBc3eztwpQp1zSnKw0x_v0uX6Zwa1x6zy6tJmZaMgKgub/exec';
+
+  var data;
+  try{
+    data = JSON.parse(document.getElementById('site-data').textContent);
+  }catch(e){
+    console.error('VOLARE site data failed to parse', e);
+    data = null;
+  }
+
+  // ---------- i18n ----------
+  // 純介面文字（導覽列連結、彈窗說明、區塊小標籤等，不屬於任何後台內容欄位）的
+  // 三語對照表。凡是「內容」——片名、票價、場館資訊、公告、聯絡資訊——一律改由
+  // data.json 的 {zh,en,ja} 三語框架欄位提供，不再放在這裡，見下方 L() 函式。
+  var TRANSLATIONS = {
+    en: {
+      nav_showing: "Now Showing",
+      nav_pricing: "Ticket Pricing",
+      nav_venue: "Venue Info",
+      nav_announce: "Announcements",
+      nav_contact: "Contact",
+      intro_label: "About VOLARE",
+      venue_secondary_title: "Other Locations",
+      contact_ticketing_title: "Tickets & Support",
+      contact_qr_title: "Follow Us",
+      modal_desc: "Tickets are available on the platforms below — please choose one to continue.",
+      modal_close: "Close",
+      pin_flag: "Pinned",
+      no_announcements: "No announcements right now.",
+      screening_ongoing: "Now Showing",
+      screening_label: "Screening"
+    },
+    ja: {
+      nav_showing: "上映中",
+      nav_pricing: "料金案内",
+      nav_venue: "施設情報",
+      nav_announce: "お知らせ",
+      nav_contact: "お問い合わせ",
+      intro_label: "VOLAREについて",
+      venue_secondary_title: "その他の店舗",
+      contact_ticketing_title: "チケット購入・お問い合わせ",
+      contact_qr_title: "SNSをフォロー",
+      modal_desc: "チケットは下記プラットフォームでご購入いただけます。",
+      modal_close: "閉じる",
+      pin_flag: "ピン留め",
+      no_announcements: "現在お知らせはありません。",
+      screening_ongoing: "常時上映中",
+      screening_label: "上映期間"
+    }
+  };
+
+  var currentLang = 'zh';
+  try{
+    var savedLang = localStorage.getItem('volare_lang');
+    if(savedLang === 'en' || savedLang === 'ja' || savedLang === 'zh') currentLang = savedLang;
+  }catch(e){ /* localStorage unavailable, default to zh */ }
+
+  // 純介面文字查詢：找不到對應語言時退回中文。
+  function t(key, zhFallback){
+    if(currentLang === 'zh') return zhFallback;
+    var dict = TRANSLATIONS[currentLang] || {};
+    return dict[key] || zhFallback;
+  }
+
+  // 內容欄位查詢：欄位格式為 {"zh":"…","en":"…","ja":"…"}。
+  // 傳入的若已經是一般字串（非三語物件，例如內部備註、網址、平台名稱），原樣傳回。
+  // 找不到目前語言的版本時，一律退回中文版，畫面永遠只顯示「一種」語言，不會中英夾雜。
+  function L(field){
+    if(field === undefined || field === null) return '';
+    if(typeof field === 'string') return field;
+    return field[currentLang] || field.zh || '';
+  }
+
+  function formatPrice(price, unit){
+    if(currentLang === 'en') return 'NT$' + price;
+    return price + (unit || '元');
+  }
+
+  function formatScreeningPeriod(f){
+    if(!f.screeningEnd){
+      return t('screening_ongoing', '常態上映中');
+    }
+    var start = (f.screeningStart || '').replace(/-/g, '/');
+    var end = (f.screeningEnd || '').replace(/-/g, '/');
+    var lbl = t('screening_label', '檔期');
+    return lbl + '：' + start + ' – ' + end;
+  }
+
+  // 記住頁面載入當下每個 data-i18n 元素「原始中文」的內容，
+  // 這樣切回中文時一定能正確還原，不會被前一次切換的英文／日文殘留覆蓋。
+  // 這段必須在第一次 renderAll() 之前執行完畢。
+  var ZH_TEXT_DEFAULTS = {};
+  var ZH_ARIA_DEFAULTS = {};
+  // 主視覺區塊的原始插畫（尚未上傳正式主視覺圖時的預設版型），存一份起來，
+  // 這樣每次 renderAll()（例如切換語言）都能在「沒有網址」時正確還原插畫，
+  // 而不是被前一次渲染留下的內容影響。
+  var HERO_VISUAL_DEFAULT_HTML = (function(){
+    var el = document.querySelector('.hero-visual');
+    return el ? el.innerHTML : '';
+  })();
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key = el.getAttribute('data-i18n');
+    if(!(key in ZH_TEXT_DEFAULTS)) ZH_TEXT_DEFAULTS[key] = el.textContent;
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(function(el){
+    var key = el.getAttribute('data-i18n-aria');
+    if(!(key in ZH_ARIA_DEFAULTS)) ZH_ARIA_DEFAULTS[key] = el.getAttribute('aria-label');
+  });
+
+  console.log('%cVOLARE 前台 版本：v6（2026-09-22）', 'font-weight:bold;color:#dc6024;');
+  console.log('本版更新：修正主打片單桌機版無效問題／場館營業時間改白字＋顏色選擇／新增據點周邊地圖上傳');
+
+  async function boot(){
+    if(API_BASE_URL && API_BASE_URL.indexOf('YOUR_APPS_SCRIPT') !== 0){
+      try{
+        var resp = await fetch(API_BASE_URL + '?action=getContent');
+        var json = await resp.json();
+        if(json && json.ok && json.content){
+          data = json.content; // 改用後台即時資料蓋掉內嵌的靜態備援內容
+        }
+      }catch(e){
+        console.warn('VOLARE: 無法連線後台資料 API，改用內嵌的備援內容顯示', e);
+      }
+    }
+
+    if(!data){
+      document.getElementById('main').innerHTML =
+        '<div class="wrap" style="padding:80px 0;"><p style="font-weight:900;">網站資料載入失敗，請重新整理頁面或聯絡管理人員。</p></div>';
+    } else {
+      wireModal();
+      wireLangSwitch();
+      renderAll();
+    }
+  }
+  boot();
+
+  function renderAll(){
+    applyStaticTranslations();
+    renderHero(data.hero);
+    renderIntro(data.intro);
+    renderShowing(data.nowShowing);
+    renderPricing(data.pricing, (data.nowShowing && data.nowShowing.films) || []);
+    renderVenue(data.venues);
+    renderAnnounce(data.announcements);
+    renderContact(data.contact);
+    renderFooter(data.footer);
+    try{ document.documentElement.setAttribute('lang', currentLang === 'zh' ? 'zh-Hant' : currentLang); }catch(e){}
+  }
+
+  function applyStaticTranslations(){
+    var dict = TRANSLATIONS[currentLang] || {};
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      var zhDefault = ZH_TEXT_DEFAULTS[key];
+      el.textContent = (currentLang !== 'zh' && dict[key]) ? dict[key] : zhDefault;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-aria');
+      var zhDefault = ZH_ARIA_DEFAULTS[key];
+      el.setAttribute('aria-label', (currentLang !== 'zh' && dict[key]) ? dict[key] : zhDefault);
+    });
+  }
+
+  function renderHero(h){
+    if(!h) return;
+    setText('hero-eyebrow', L(h.eyebrow));
+    setText('hero-title', h.title);
+    setText('hero-subtitle', L(h.subtitle));
+    setText('hero-tagline-zh', L(h.tagline));
+    setText('hero-tagline-en', h.brandSlogan); // 固定雙語標語，不隨語言切換
+    setText('hero-cta-primary', L(h.ctaPrimaryLabel));
+    setText('hero-cta-secondary', L(h.ctaSecondaryLabel));
+    setText('nav-brand-sub', L(h.subtitle));
+    setText('nav-cta-label', L(h.ctaPrimaryLabel));
+    setText('modal-title', L(h.ctaPrimaryLabel));
+
+    var visual = document.querySelector('.hero-visual');
+    if(visual){
+      if(h.heroImageUrl){
+        visual.innerHTML = '<img src="'+esc(h.heroImageUrl)+'" alt="">';
+      } else {
+        visual.innerHTML = HERO_VISUAL_DEFAULT_HTML;
+      }
+    }
+  }
+
+  function renderIntro(intro){
+    if(!intro) return;
+    setText('intro-text', L(intro.text));
+    var box = document.getElementById('intro-photo');
+    if(intro.photoUrl){
+      box.className = 'media-photo intro-photo';
+      box.innerHTML = '<img src="'+esc(intro.photoUrl)+'" alt="">';
+    } else {
+      box.className = 'placeholder-box intro-photo';
+      box.innerHTML = '<span class="ph-icon">🖼️</span><span>'+esc(intro.photoPlaceholder || '待上傳素材')+'</span>';
+    }
+  }
+
+  function renderShowing(ns){
+    if(!ns) return;
+    setText('showing-note', L(ns.sectionNote));
+    var grid = document.getElementById('film-grid');
+    var html = '';
+    (ns.films||[]).forEach(function(f){
+      html += '<article class="film-card'+(f.featured?' featured':'')+'">'
+        + '<div class="film-poster">'
+        +   (f.posterUrl
+              ? '<img src="'+esc(f.posterUrl)+'" alt="'+esc(L(f.name))+'">'
+              : '<div class="placeholder-box"><span class="ph-icon">🎬</span><span>'+esc(f.posterPlaceholder)+'</span></div>')
+        + '</div>'
+        + '<div class="film-body">'
+        +   '<div class="film-name">'+esc(L(f.name))+'</div>'
+        +   (f.note ? '<span class="film-note">'+esc(L(f.note))+'</span>' : '')
+        +   '<div class="film-period">'+esc(formatScreeningPeriod(f))+'</div>'
+        + '</div>'
+        + '</article>';
+    });
+    if(ns.racing){
+      html += '<article class="film-card">'
+        + '<div class="film-poster">'
+        +   (ns.racing.posterUrl
+              ? '<img src="'+esc(ns.racing.posterUrl)+'" alt="'+esc(L(ns.racing.name))+'">'
+              : '<div class="placeholder-box"><span class="ph-icon">🏎️</span><span>'+esc(ns.racing.posterPlaceholder)+'</span></div>')
+        + '</div>'
+        + '<div class="film-body">'
+        +   '<div class="film-name">'+esc(L(ns.racing.name))+'</div>'
+        + '</div>'
+        + '</article>';
+    }
+    grid.innerHTML = html;
+  }
+
+  function tierRowHtml(tier){
+    var main = '<div class="tier-main">'
+      + '<span class="tier-label">'+esc(L(tier.label))+'</span>'
+      + '<span class="tier-price">'+esc(formatPrice(tier.price, tier.unit))+'</span>'
+      + '</div>';
+    var weekday = '';
+    if(tier.weekday){
+      weekday = '<span class="tier-weekday">'+esc(L(tier.weekday.label))+'　'+esc(formatPrice(tier.weekday.price, tier.weekday.unit))+'</span>';
+    }
+    return '<div class="tier-row'+(tier.highlight?' highlight':'')+'">' + main + weekday + '</div>';
+  }
+
+  function renderPricing(p, films){
+    if(!p) return;
+    setText('pricing-note', L(p.sectionNote));
+    var grid = document.getElementById('price-grid');
+    var html = '';
+    (p.groups||[]).forEach(function(g){
+      var includesHtml = '';
+      if(g.id === 'standard'){
+        var included = (films||[]).filter(function(f){ return !f.featured; }).map(function(f){ return L(f.name); });
+        if(included.length){
+          includesHtml = '<p class="price-includes">'+esc(included.join(currentLang === 'zh' ? '．' : ' / '))+'</p>';
+        }
+      }
+      html += '<div class="price-card theme-'+esc(g.theme)+'">'
+        + '<h3>'+esc(L(g.title))+'</h3>'
+        + includesHtml
+        + '<div class="tier-list">'
+        + (g.tiers||[]).map(tierRowHtml).join('')
+        + '</div>'
+        + (g.footnote ? '<p class="price-footnote">'+esc(L(g.footnote))+'</p>' : '')
+        + '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  function hoursTable(hours, color){
+    var style = color ? ' style="color:'+esc(color)+';"' : '';
+    return '<table class="hours-table"'+style+'>' + (hours||[]).map(function(h){
+      return '<tr><td>'+esc(L(h.days))+'</td><td>'+esc(h.time)+'</td></tr>';
+    }).join('') + '</table>';
+  }
+
+  function renderVenue(venues){
+    var secondaryBlock = document.getElementById('venue-secondary');
+    if(!venues || !venues.length){
+      document.getElementById('venue-primary').innerHTML = '';
+      if(secondaryBlock) secondaryBlock.hidden = true;
+      return;
+    }
+    var primary = venues[0];
+    var rest = venues.slice(1);
+
+    var primaryHtml = ''
+      + '<div class="venue-card">'
+      +   '<h3 class="venue-name">'+esc(L(primary.name))+'</h3>'
+      +   '<span class="venue-status">'+esc(L(primary.status))+'</span>'
+      +   '<p class="venue-address">'+esc(L(primary.address))+'</p>'
+      +   hoursTable(primary.hours, primary.hoursColor)
+      +   '<ul class="transit-list">' + (primary.transit||[]).map(function(tItem){return '<li>'+esc(L(tItem))+'</li>';}).join('') + '</ul>'
+      + '</div>'
+      + '<div class="venue-card venue-map">'
+      +   (primary.mapImageUrl
+            ? '<img src="'+esc(primary.mapImageUrl)+'" alt="'+esc(L(primary.name))+' 周邊地圖">'
+            : '<div class="placeholder-box"><span class="ph-icon">🗺️</span><span>'+esc(primary.mapPlaceholder)+'</span></div>')
+      + '</div>';
+    document.getElementById('venue-primary').innerHTML = primaryHtml;
+
+    if(secondaryBlock){
+      if(rest.length){
+        secondaryBlock.hidden = false;
+        var miniHtml = rest.map(function(v){
+          return '<div class="venue-mini">'
+            + '<h4>'+esc(L(v.name))+'</h4>'
+            + '<p>'+esc(L(v.address))+'</p>'
+            + hoursTable(v.hours, v.hoursColor)
+            + '</div>';
+        }).join('');
+        document.getElementById('venue-mini-grid').innerHTML = miniHtml;
+      } else {
+        secondaryBlock.hidden = true;
+      }
+    }
+  }
+
+  function renderAnnounce(list){
+    var wrap = document.getElementById('announce-list');
+    if(!list || !list.length){
+      wrap.innerHTML = '<p style="opacity:.7;">'+esc(t('no_announcements', '目前沒有最新公告。'))+'</p>';
+      return;
+    }
+    wrap.innerHTML = list.map(function(a){
+      return '<article class="announce-card">'
+        + '<div class="announce-date">'+esc(a.date)+'</div>'
+        + '<div class="announce-body">'
+        +   '<div class="announce-title">'+esc(L(a.title))+(a.pinned?'<span class="pin-flag">'+esc(t('pin_flag','置頂'))+'</span>':'')+'</div>'
+        +   '<p class="announce-text">'+esc(L(a.body))+'</p>'
+        + '</div>'
+        + '</article>';
+    }).join('');
+  }
+
+  function ticketRowLabel(platform){
+    if(currentLang === 'en') return platform + ' Tickets';
+    if(currentLang === 'ja') return platform + 'で購入';
+    return platform + ' 購票';
+  }
+  function modalTicketLabel(platform){
+    if(currentLang === 'en') return 'Buy on ' + platform;
+    if(currentLang === 'ja') return platform + 'で購入';
+    return '前往 ' + platform + ' 購票';
+  }
+
+  function renderContact(c){
+    if(!c) return;
+    setText('contact-note', L(c.sectionNote));
+
+    var ticketRow = document.getElementById('ticket-row');
+    ticketRow.innerHTML = (c.ticketing||[]).map(function(tk){
+      return '<a class="btn on-dark small" href="'+esc(tk.href)+'" target="_blank" rel="noopener">'+esc(ticketRowLabel(tk.platform))+'</a>';
+    }).join('');
+
+    var lines = document.getElementById('contact-lines');
+    var lh = '';
+    if(c.line){
+      lh += '<div class="contact-line"><span class="label">'+esc(L(c.line.label))+'</span><span class="todo-tag">'+esc(c.line.note)+'</span></div>';
+    }
+    if(c.email){
+      lh += '<div class="contact-line"><span class="label">'+esc(L(c.email.label))+'</span><span class="value">'+esc(c.email.value)+'</span></div>';
+    }
+    lines.innerHTML = lh;
+
+    var qrGrid = document.getElementById('qr-grid');
+    qrGrid.innerHTML = (c.socials||[]).map(function(s){
+      return '<div class="qr-box">'
+        + (s.qrUrl
+            ? '<div class="qr-photo"><img src="'+esc(s.qrUrl)+'" alt="'+esc(s.platform)+' QR Code"></div>'
+            : '<div class="qr-placeholder">▦</div>')
+        + '<div class="qr-label">'+esc(s.platform)+'</div>'
+        + (s.qrUrl ? '' : '<div class="qr-note">'+esc(s.qrPlaceholder)+'</div>')
+        + '</div>';
+    }).join('');
+
+    var modalList = document.getElementById('modal-ticket-list');
+    modalList.innerHTML = (c.ticketing||[]).map(function(tk){
+      return '<a class="btn primary" href="'+esc(tk.href)+'" target="_blank" rel="noopener">'+esc(modalTicketLabel(tk.platform))+'</a>';
+    }).join('');
+  }
+
+  function renderFooter(f){
+    if(!f) return;
+    setText('footer-copyright', L(f.copyright));
+    setText('footer-legal', L(f.legal));
+  }
+
+  function setText(id, val){
+    var el = document.getElementById(id);
+    if(el) el.textContent = val || '';
+  }
+
+  // nav toggle
+  var toggle = document.getElementById('nav-toggle');
+  var links = document.getElementById('nav-links');
+  toggle.addEventListener('click', function(){
+    var open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true':'false');
+  });
+  links.addEventListener('click', function(e){
+    if(e.target.tagName === 'A'){
+      links.classList.remove('open');
+      toggle.setAttribute('aria-expanded','false');
+    }
+  });
+
+  // language switch
+  function wireLangSwitch(){
+    var btns = document.querySelectorAll('.lang-btn');
+    btns.forEach(function(btn){
+      if(btn.getAttribute('data-lang') === currentLang){
+        btn.setAttribute('aria-pressed', 'true');
+      } else {
+        btn.setAttribute('aria-pressed', 'false');
+      }
+      btn.addEventListener('click', function(){
+        var lang = btn.getAttribute('data-lang');
+        if(lang === currentLang) return;
+        currentLang = lang;
+        btns.forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+        try{ localStorage.setItem('volare_lang', currentLang); }catch(e){}
+        renderAll();
+      });
+    });
+  }
+
+  // modal
+  function wireModal(){
+    var overlay = document.getElementById('modal-overlay');
+    var closeBtn = document.getElementById('modal-close');
+    document.querySelectorAll('[data-open-modal]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        overlay.classList.add('open');
+      });
+    });
+    closeBtn.addEventListener('click', function(){ overlay.classList.remove('open'); });
+    overlay.addEventListener('click', function(e){
+      if(e.target === overlay) overlay.classList.remove('open');
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') overlay.classList.remove('open');
+    });
+  }
+
+})();
+</script>
+
